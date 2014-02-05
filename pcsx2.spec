@@ -1,11 +1,14 @@
 Name: pcsx2
-Version: 1.1.0
-Release: 5%{?dist}
+Version: 1.2.0
+Release: 1%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://code.google.com/p/pcsx2/
-Source0: https://pcsx2.googlecode.com/files/%{name}-%{version}-r5674-lnx-sources.tar.bz2
-Patch1: %{name}-1.1.0_fedora_cflags_opts.diff
+#github source contains copyrighted material, so modified with
+#script used was rebuild_pcsx2_tarball contained in Source1
+Source0: https://github.com/PCSX2/pcsx2/archive/v1.2.tar.gz
+Source1: rebuild_pcsx2_tarball.sh
+Patch1: %{name}-1.2.0_fedora_cflags_opts.diff
 # PCSX2 does not support running as a 64 bit application.
 # http://code.google.com/p/pcsx2/wiki/ChrootAnd64bStatusLinux
 ExclusiveArch: i686
@@ -31,6 +34,7 @@ BuildRequires: soundtouch-devel
 BuildRequires: libX11-devel
 BuildRequires: libICE-devel
 BuildRequires: libaio-devel
+BuildRequires: mesa-libGLES
 
 Requires: joystick
 Requires: hicolor-icon-theme
@@ -42,15 +46,15 @@ support this instruction set, it does not have enough horse power to run
 this emulator anyway.
 
 %prep
-%setup -q -n pcsx2.snapshot-5674
+%setup -q -n pcsx2-1.2
 %patch1 -p1
 
 # To remove executable bits from man, doc and icon files
-chmod -x %{name}/Docs/GPL.txt %{name}/Docs/License.txt %{name}/Docs/readme-Docs.txt %{name}/Docs/PCSX2_FAQ.doc %{name}/Docs/PCSX2_Readme.doc bin/docs/pcsx2.1 linux_various/pcsx2.xpm
+chmod -x pcsx2/Docs/GPL.txt pcsx2/Docs/License.txt pcsx2/Docs/readme-Docs.txt pcsx2/Docs/PCSX2_FAQ.doc pcsx2/Docs/PCSX2_Readme.doc bin/docs/pcsx2.1 linux_various/pcsx2.xpm
 
 # Remove DOS encoding errors in txt files
-sed -i 's/\r//' %{name}/Docs/GPL.txt
-sed -i 's/\r//' %{name}/Docs/License.txt
+sed -i 's/\r//' pcsx2/Docs/GPL.txt
+sed -i 's/\r//' pcsx2/Docs/License.txt
 
 %build
 
@@ -62,12 +66,12 @@ sed -i 's/\r//' %{name}/Docs/License.txt
 # Extensive testing will is therefore needed. See rpmfusion bug #2455
 
 %cmake . -DPACKAGE_MODE=TRUE \
-         -DGLSL_SHADER_DIR=%{_libdir}/%{name} \
+         -DGLSL_SHADER_DIR=%{_libdir}/pcsx2 \
          -DBUILD_REPLAY_LOADERS=FALSE \
          -DXDG_STD=TRUE \
          -DGLSL_API=FALSE \
-         -DPLUGIN_DIR=%{_libdir}/%{name} \
-         -DGAMEINDEX_DIR=%{_datadir}/%{name} \
+         -DPLUGIN_DIR=%{_libdir}/pcsx2 \
+         -DGAMEINDEX_DIR=%{_datadir}/pcsx2 \
          -DFORCE_INTERNAL_SOUNDTOUCH=FALSE \
          -DFORCE_INTERNAL_SDL=FALSE \
          -DCMAKE_BUILD_STRIP=FALSE \
@@ -85,12 +89,12 @@ rm -rf %{buildroot}/usr/share/doc/pcsx2
 
 # Install icon
 mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
-install -pm 644 %{_builddir}/%{name}.snapshot-5674/linux_various/pcsx2.xpm %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
+install -pm 644 %{_builddir}/%{name}-1.2/linux_various/pcsx2.xpm %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
 
 # Install Desktop file
 desktop-file-install                                    \
 --dir=%{buildroot}/%{_datadir}/applications              \
-%{_builddir}/%{name}.snapshot-5674/linux_various/pcsx2.desktop
+%{_builddir}/%{name}-1.2/linux_various/pcsx2.desktop
 
 
 #strip extra copy of icon file, Wrong place for fedora
@@ -120,15 +124,20 @@ fi
 
 %files -f pcsx2_Iconized.lang -f pcsx2_Main.lang
 %doc bin/docs/PCSX2_Readme.pdf bin/docs/PCSX2_FAQ.pdf 
-%{_bindir}/%{name}
-%{_libdir}/%{name}/
-%{_datadir}/applications/%{name}.desktop
-%{_datadir}/icons/hicolor/128x128/apps/%{name}.xpm
-%{_mandir}/man1/%{name}.*
-%{_datadir}/%{name}/
+%{_bindir}/pcsx2
+%{_libdir}/pcsx2/
+%{_datadir}/applications/pcsx2.desktop
+%{_datadir}/icons/hicolor/128x128/apps/pcsx2.xpm
+%{_mandir}/man1/pcsx2.*
+%{_datadir}/pcsx2/
 
 
 %changelog
+* Tue Feb 04 2014 Giles Birchley <gbirchey@blueyonder.co.uk> -1.2.0-1
+- Updated source to 1.2
+- Updated patch1
+- Source required modification to remove copyrighted files - added Source1
+
 * Sat Jul 27 2013 Giles Birchley <gbirchey@blueyonder.co.uk> - 1.1.0-5
 - made overlooked change suggested in rpmfusion review (#2455)
 - changed requires from libGL-devel/libGLU-devel instead of mesa-libGL-devel
@@ -180,6 +189,10 @@ fi
 - Use %%{_prefix} instead of /usr for CMAKE install prefix
 - add Gregory Hainaut's patch to fix issue with gcc 4.8, for Fedora 19 build
 - Changed cmake option of DBUILD_REPLAY_LOADERS to false and changed %%files accrdingly
+
+* Tue Mar 05 2013 Giles Birchley <gbirchey@blueyonder.co.uk>
+- bleeding edge build, altered package name
+- added pcsx2 as a conflict
 
 * Mon Oct 15 2012 Giles Birchley <gbirchey@blueyonder.co.uk> - 1.0.0-1
 - Build of official 1.0.0 Release
