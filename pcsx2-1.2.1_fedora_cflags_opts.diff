@@ -1,7 +1,7 @@
 #Alter optimisation cflags to strip out those already automatically specified
 #by %%cmake rpm macro (which uses -o2) 
---- pcsx2-1.2.0/pcsx2/CMakeLists.txt
-+++ pcsx2-1.2.0/pcsx2/CMakeLists.txt
+--- pcsx2-1.2.1/pcsx2/CMakeLists.txt
++++ pcsx2-1.2.1/pcsx2/CMakeLists.txt
 @@ -32,45 +32,7 @@ set(DebugFlags
  	-g)
  
