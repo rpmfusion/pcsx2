@@ -1,14 +1,14 @@
 Name: pcsx2
-Version: 1.2.0
+Version: 1.2.1
 Release: 1%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://code.google.com/p/pcsx2/
 #github source contains copyrighted material, so modified with
 #script used was rebuild_pcsx2_tarball contained in Source1
-Source0: https://github.com/PCSX2/pcsx2/archive/v1.2.tar.gz
-Source1: rebuild_pcsx2_tarball.sh
-Patch1: %{name}-1.2.0_fedora_cflags_opts.diff
+Source0: https://github.com/PCSX2/pcsx2/archive/v1.2.1.tar.gz
+Source1: pcsx2-1.2.1_rebuild_tarball.sh
+Patch1: %{name}-1.2.1_fedora_cflags_opts.diff
 # PCSX2 does not support running as a 64 bit application.
 # http://code.google.com/p/pcsx2/wiki/ChrootAnd64bStatusLinux
 ExclusiveArch: i686
@@ -46,7 +46,7 @@ support this instruction set, it does not have enough horse power to run
 this emulator anyway.
 
 %prep
-%setup -q -n pcsx2-1.2
+%setup -q -n pcsx2-1.2.1
 %patch1 -p1
 
 # To remove executable bits from man, doc and icon files
@@ -89,12 +89,12 @@ rm -rf %{buildroot}/usr/share/doc/pcsx2
 
 # Install icon
 mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
-install -pm 644 %{_builddir}/%{name}-1.2/linux_various/pcsx2.xpm %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
+install -pm 644 %{_builddir}/%{name}-1.2.1/linux_various/pcsx2.xpm %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
 
 # Install Desktop file
 desktop-file-install                                    \
 --dir=%{buildroot}/%{_datadir}/applications              \
-%{_builddir}/%{name}-1.2/linux_various/pcsx2.desktop
+%{_builddir}/%{name}-1.2.1/linux_various/pcsx2.desktop
 
 
 #strip extra copy of icon file, Wrong place for fedora
@@ -133,6 +133,11 @@ fi
 
 
 %changelog
+* Tue Feb 04 2014 Giles Birchley <gbirchey@blueyonder.co.uk> -1.2.1-1
+- Updated source to 1.2.1
+- Updated patch1 permissions
+- Source required modification to remove copyrighted files - added Source1
+
 * Tue Feb 04 2014 Giles Birchley <gbirchey@blueyonder.co.uk> -1.2.0-1
 - Updated source to 1.2
 - Updated patch1
