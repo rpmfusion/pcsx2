@@ -1,6 +1,6 @@
 Name: pcsx2
 Version: 1.2.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://code.google.com/p/pcsx2/
@@ -133,6 +133,9 @@ fi
 
 
 %changelog
+* Mon Sep 01 2014 Sérgio Basto <sergio@serjux.com> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Tue Feb 04 2014 Giles Birchley <gbirchey@blueyonder.co.uk> -1.2.1-1
 - Updated source to 1.2.1
 - Updated patch1 permissions
