@@ -1,6 +1,6 @@
 Name: pcsx2
 Version: 1.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://github.com/PCSX2/pcsx2
@@ -8,6 +8,7 @@ URL: https://github.com/PCSX2/pcsx2
 #script download_pcsx2_1.4_tarball.sh contained in Source1
 Source0: pcsx2.1.4.tar.gz
 Source1: download_pcsx2_1.4_tarball.sh
+Patch1:  pcsx2-gcc6.patch
 # PCSX2 does not support running as a 64 bit application.
 # http://code.google.com/p/pcsx2/wiki/ChrootAnd64bStatusLinux
 ExclusiveArch: i686
@@ -45,6 +46,7 @@ this emulator anyway.
 
 %prep
 %setup -q -n pcsx2-1.4
+%patch1 -p1 -b .gcc6
 
 # To remove executable bits from man, doc and icon files
 chmod -x pcsx2/Docs/GPL.txt pcsx2/Docs/License.txt pcsx2/Docs/readme-Docs.txt pcsx2/Docs/PCSX2_FAQ.doc pcsx2/Docs/PCSX2_Readme.doc bin/docs/PCSX2.1 linux_various/PCSX2.xpm
@@ -140,6 +142,9 @@ fi
 
 
 %changelog
+* Thu Jul 14 2016 Sérgio Basto <sergio@serjux.com> - 1.4-2
+- Add gcc6 patch
+
 * Thu Feb 11 2016 Giles Birchley <gbirchley@blueyonder.co.uk> -1.4-1
 - Build for new release 1.4
 - Drop patch pcsx2-1.3.1_fedora_cflags_opts.diff - cflag options now streamlined upstream
