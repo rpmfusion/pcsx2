@@ -1,6 +1,6 @@
 Name: pcsx2
 Version: 1.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://github.com/PCSX2/pcsx2
@@ -23,11 +23,11 @@ BuildRequires: gettext
 BuildRequires: libGL-devel
 BuildRequires: libGLU-devel
 BuildRequires: alsa-lib-devel
-BuildRequires: SDL-devel
+BuildRequires: SDL2-devel
 BuildRequires: gtk2-devel
 BuildRequires: portaudio-devel
 BuildRequires: sparsehash-devel
-BuildRequires: wxGTK-devel
+BuildRequires: wxGTK3-devel
 BuildRequires: soundtouch-devel
 BuildRequires: libX11-devel
 BuildRequires: libICE-devel
@@ -142,6 +142,11 @@ fi
 
 
 %changelog
+* Sun Oct 08 2017 Sérgio Basto <sergio@serjux.com> - 1.4-5
+- Rebuild for soundtouch 2.0.0
+- Move to SDL2 and wxGTK3 based on install intructions on
+  https://github.com/PCSX2/pcsx2/wiki/Installing-on-Linux
+
 * Thu Aug 31 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 1.4-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
