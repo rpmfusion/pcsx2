@@ -14,26 +14,33 @@ Patch1:  pcsx2-gcc6.patch
 ExclusiveArch: i686
 BuildRequires: desktop-file-utils
 BuildRequires: cmake
-BuildRequires: glew-devel
 BuildRequires: zlib-devel
 BuildRequires: bzip2-devel
-BuildRequires: libXrandr-devel
 BuildRequires: freetype-devel
 BuildRequires: gettext
+BuildRequires: glew-devel
 BuildRequires: libGL-devel
 BuildRequires: libGLU-devel
-BuildRequires: alsa-lib-devel
-BuildRequires: SDL2-devel
-BuildRequires: gtk2-devel
-BuildRequires: portaudio-devel
-BuildRequires: sparsehash-devel
-BuildRequires: wxGTK3-devel
-BuildRequires: soundtouch-devel
 BuildRequires: libX11-devel
 BuildRequires: libICE-devel
+BuildRequires: libXrandr-devel
+BuildRequires: mesa-libGLES-devel
+BuildRequires: alsa-lib-devel
+BuildRequires: SDL-devel
+#BuildRequires: SDL2-devel
+BuildRequires: gtk2-devel
+#BuildRequires: gtk3-devel
+BuildRequires: portaudio-devel
+BuildRequires: sparsehash-devel
+%if (0%{?fedora} >= 28)
+BuildRequires: compat-wxGTK3-gtk2-devel
+%else
+BuildRequires: wxGTK-devel
+%endif
+#BuildRequires: wxGTK3-devel
+BuildRequires: soundtouch-devel
 BuildRequires: libaio-devel
 BuildRequires: lzma-devel
-BuildRequires: mesa-libGLES
 
 Requires: joystick
 Requires: hicolor-icon-theme
@@ -71,15 +78,18 @@ sed -i 's/@PCSX2_MENU_CATEGORIES@/Game;Emulator;GTK;/g' linux_various/PCSX2.desk
 	 -DGLSL_SHADER_DIR=%{_libdir}/pcsx2 \
 	 -DBUILD_REPLAY_LOADERS=FALSE \
 	 -DXDG_STD=TRUE \
-	 -DGLSL_API=FALSE \
+	 -DGLSL_API=TRUE \
 	 -DFORCE_INTERNAL_SOUNDTOUCH=FALSE \
 	 -DFORCE_INTERNAL_SDL=FALSE \
 	 -DPLUGIN_DIR=%{_libdir}/pcsx2 \
 	 -DGAMEINDEX_DIR=%{_datadir}/pcsx2 \
 	 -DCMAKE_BUILD_STRIP=FALSE \
 	 -DGTK3_API=FALSE \
+%if (0%{?fedora} >= 28)
+	 -DWX28_API=FALSE \
+%else
 	 -DWX28_API=TRUE \
-	 -DDISABLE_ADVANCE_SIMD=TRUE \
+%endif
 	 -DEXTRA_PLUGINS=FALSE \
 	 -DSDL2_API=FALSE \
 	 -DCMAKE_BUILD_TYPE=Release
@@ -144,8 +154,10 @@ fi
 %changelog
 * Sun Oct 08 2017 Sérgio Basto <sergio@serjux.com> - 1.4-5
 - Rebuild for soundtouch 2.0.0
-- Move to SDL2 and wxGTK3 based on install intructions on
+- Just enable compat-wxGTK3-gtk2, pcsx2 fails to detect wxGTK3
+  therefore SDL2 also is disabled, intructions on
   https://github.com/PCSX2/pcsx2/wiki/Installing-on-Linux
+- Enable GLSL_API and AVX
 
 * Thu Aug 31 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 1.4-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
