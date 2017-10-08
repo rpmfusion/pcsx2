@@ -41,6 +41,13 @@ BuildRequires: wxGTK-devel
 BuildRequires: soundtouch-devel
 BuildRequires: libaio-devel
 BuildRequires: lzma-devel
+# for /usr/bin/perl
+%if 0%{?rhel} && 0%{?rhel} < 8
+BuildRequires: perl
+BuildRequires: perl-version
+%else
+BuildRequires: perl-interpreter
+%endif
 
 Requires: joystick
 Requires: hicolor-icon-theme
@@ -158,6 +165,7 @@ fi
   therefore SDL2 also is disabled, intructions on
   https://github.com/PCSX2/pcsx2/wiki/Installing-on-Linux
 - Enable GLSL_API and AVX
+- Fix Perl builroot changes.
 
 * Thu Aug 31 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 1.4-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
