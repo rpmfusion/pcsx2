@@ -1,6 +1,6 @@
 Name: pcsx2
 Version: 1.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://github.com/PCSX2/pcsx2
@@ -159,6 +159,9 @@ fi
 
 
 %changelog
+* Tue Jan 30 2018 Sérgio Basto <sergio@serjux.com> - 1.4-6
+- Rebuilt to fix core dump with wxWindow
+
 * Sun Oct 08 2017 Sérgio Basto <sergio@serjux.com> - 1.4-5
 - Rebuild for soundtouch 2.0.0
 - Just enable compat-wxGTK3-gtk2, pcsx2 fails to detect wxGTK3
