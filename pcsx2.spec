@@ -82,7 +82,7 @@ sed -i 's/@PCSX2_MENU_CATEGORIES@/Game;Emulator;GTK;/g' linux_various/PCSX2.desk
 # have no much impact on speed 2/ some gcc flags (used to) crash PCSX2"
 # Extensive testing will is therefore needed. See rpmfusion bug #2455      
 
-%if (0%{?fedora} && 0%{?fedora} == 27)
+%if 0%{?fedora} == 27
 export WX_CONFIG=wx-config-3.0-gtk2
 %endif
 
