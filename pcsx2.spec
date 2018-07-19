@@ -1,6 +1,6 @@
 Name: pcsx2
 Version: 1.4
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://github.com/PCSX2/pcsx2
@@ -163,6 +163,9 @@ fi
 
 
 %changelog
+* Thu Jul 19 2018 Leigh Scott <leigh123linux@googlemail.com> - 1.4-9
+- Rebuild for new soundtouch version
+
 * Sun May 20 2018 Sérgio Basto <sergio@serjux.com> - 1.4-8
 - Try fix f27 (#4775) use compat-wxGTK3-gtk2-devel
 - Add BR xz-devel to dectect LibLZMA
