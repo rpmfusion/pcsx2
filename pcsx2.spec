@@ -106,8 +106,12 @@ export WX_CONFIG=wx-config-3.0-gtk2
 %else
 	 -DWX28_API=TRUE \
 %endif
-	 -DEXTRA_PLUGINS=FALSE \
+%if (0%{?fedora} >= 28)
+     -DSDL2_API=TRUE \
+%else
 	 -DSDL2_API=FALSE \
+%endif
+	 -DEXTRA_PLUGINS=FALSE \
  	 -DDISABLE_ADVANCE_SIMD=TRUE \
  	 -DOpenGL_GL_PREFERENCE=GLVND \
 	 -DCMAKE_BUILD_TYPE=Release
