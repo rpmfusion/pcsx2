@@ -13,6 +13,7 @@ Patch2:  pcsx2-wxWidgets-SDL2.patch
 # PCSX2 does not support running as a 64 bit application.
 # http://code.google.com/p/pcsx2/wiki/ChrootAnd64bStatusLinux
 ExclusiveArch: i686
+BuildRequires: gcc gcc-c++
 BuildRequires: desktop-file-utils
 BuildRequires: cmake
 BuildRequires: zlib-devel
