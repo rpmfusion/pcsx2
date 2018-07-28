@@ -67,6 +67,7 @@ this emulator anyway.
 %prep
 %setup -q -n pcsx2-1.4
 %patch1 -p1 -b .gcc6
+%patch2 -p1 -b .SDL2
 
 # To remove executable bits from man, doc and icon files
 chmod -x pcsx2/Docs/GPL.txt pcsx2/Docs/License.txt pcsx2/Docs/readme-Docs.txt pcsx2/Docs/PCSX2_FAQ.doc pcsx2/Docs/PCSX2_Readme.doc bin/docs/PCSX2.1 linux_various/PCSX2.xpm
