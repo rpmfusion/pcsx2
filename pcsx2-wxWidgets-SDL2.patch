@@ -10,8 +10,8 @@ Fedora 27).
  cmake/ApiValidation.cmake | 41 ++++++++++++++++++++++++++++-------------
  1 file changed, 28 insertions(+), 13 deletions(-)
 
---- cmake/ApiValidation.cmake.orig	2016-02-11 22:03:53.000000000 +0000
-+++ cmake/ApiValidation.cmake	2018-07-28 19:02:46.396522565 +0100
+--- ./cmake/ApiValidation.cmake.orig	2016-02-11 22:03:53.000000000 +0000
++++ ./cmake/ApiValidation.cmake	2018-07-28 19:02:46.396522565 +0100
 @@ -1,27 +1,42 @@
  set(wx_sdl_c_code "
  #include <wx/setup.h>
