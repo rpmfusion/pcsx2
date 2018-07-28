@@ -10,11 +10,9 @@ Fedora 27).
  cmake/ApiValidation.cmake | 41 ++++++++++++++++++++++++++++-------------
  1 file changed, 28 insertions(+), 13 deletions(-)
 
-diff --git a/cmake/ApiValidation.cmake b/cmake/ApiValidation.cmake
-index e7a4f99a77..f93bc67fcd 100644
---- a/cmake/ApiValidation.cmake
-+++ b/cmake/ApiValidation.cmake
-@@ -1,9 +1,14 @@
+--- cmake/ApiValidation.cmake.orig	2016-02-11 22:03:53.000000000 +0000
++++ cmake/ApiValidation.cmake	2018-07-28 19:02:46.396522565 +0100
+@@ -1,27 +1,42 @@
  set(wx_sdl_c_code "
  #include <wx/setup.h>
  
@@ -29,8 +27,7 @@ index e7a4f99a77..f93bc67fcd 100644
 +}
  ")
  
- set(gcc7_mmx_code "
-@@ -83,19 +88,29 @@ function(WX_vs_SDL)
+ function(WX_vs_SDL)
      file(WRITE "${CMAKE_BINARY_DIR}/wx_sdl.c" "${wx_sdl_c_code}")
      enable_language(C)
  
@@ -42,6 +39,11 @@ index e7a4f99a77..f93bc67fcd 100644
 -            COMPILE_OUTPUT_VARIABLE OUT
 -            CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${wxWidgets_INCLUDE_DIRS}"
 -        )
+-
+-    if (${OUT} MATCHES "cmake_WX_SDL" AND SDL2_API)
+-        message(FATAL_ERROR "WxWidget is linked to SDL (wxUSE_LIBSDL) and it is likely SDL1.2.
+-        Unfortunately you try to build PCSX2 with SDL2 support which is not compatible
+-        Please use -DSDL2_API=FALSE")
 +    try_compile(
 +        wx_linked_to_sdl
 +        "${CMAKE_BINARY_DIR}"
@@ -60,15 +62,10 @@ index e7a4f99a77..f93bc67fcd 100644
 +        COMMAND grep -c SDL2
 +        OUTPUT_VARIABLE sdl2_count
 +    )
- 
--    if (${OUT} MATCHES "cmake_WX_SDL" AND SDL2_API)
--        message(FATAL_ERROR "WxWidget is linked to SDL (wxUSE_LIBSDL) and it is likely SDL1.2.
--        Unfortunately you try to build PCSX2 with SDL2 support which is not compatible
--        Please use -DSDL2_API=FALSE")
++
 +    if (SDL2_API AND sdl2_count STREQUAL "0")
 +        message(FATAL_ERROR "wxWidgets is linked to SDL1.2. Please use -DSDL2_API=FALSE.")
 +    elseif (NOT SDL2_API AND NOT sdl2_count STREQUAL "0")
 +        message(FATAL_ERROR "wxWidgets is linked to SDL2. Please use -DSDL2_API=TRUE")
      endif()
  endfunction()
- 
