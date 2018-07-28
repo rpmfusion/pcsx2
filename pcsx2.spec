@@ -1,6 +1,6 @@
 Name: pcsx2
 Version: 1.4
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://github.com/PCSX2/pcsx2
@@ -9,6 +9,7 @@ URL: https://github.com/PCSX2/pcsx2
 Source0: pcsx2.1.4.tar.gz
 Source1: download_pcsx2_1.4_tarball.sh
 Patch1:  pcsx2-gcc6.patch
+Patch2:  pcsx2-wxWidgets-SDL2.patch
 # PCSX2 does not support running as a 64 bit application.
 # http://code.google.com/p/pcsx2/wiki/ChrootAnd64bStatusLinux
 ExclusiveArch: i686
@@ -26,12 +27,16 @@ BuildRequires: libICE-devel
 BuildRequires: libXrandr-devel
 BuildRequires: mesa-libGLES-devel
 BuildRequires: alsa-lib-devel
-BuildRequires: SDL-devel
-#BuildRequires: SDL2-devel
 BuildRequires: gtk2-devel
 #BuildRequires: gtk3-devel
 BuildRequires: portaudio-devel
 BuildRequires: sparsehash-devel
+%if (0%{?fedora} >= 28)
+BuildRequires: SDL2-devel
+%else
+BuildRequires: SDL-devel
+%endif
+# use SDL that depends wxGTK
 %if (0%{?fedora} >= 27)
 BuildRequires: compat-wxGTK3-gtk2-devel
 %else
@@ -163,6 +168,10 @@ fi
 
 
 %changelog
+* Sat Jul 28 2018 Sérgio Basto <sergio@serjux.com> - 1.4-10
+- Try fix rfbz #4962
+- Use the same SDL that wxGTK depends on (F27 SDL, F28 SDL2)
+
 * Fri Jul 27 2018 RPM Fusion Release Engineering <sergio@serjux.com> - 1.4-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
