@@ -1,6 +1,6 @@
 Name: pcsx2
 Version: 1.4
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: A Sony Playstation2 emulator
 License: GPLv3
 URL: https://github.com/PCSX2/pcsx2
@@ -174,6 +174,9 @@ fi
 
 
 %changelog
+* Sun Aug 19 2018 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.4-11
+- Rebuilt for Fedora 29 Mass Rebuild binutils issue
+
 * Sat Jul 28 2018 Sérgio Basto <sergio@serjux.com> - 1.4-10
 - Try fix rfbz #4962
 - Use the same SDL that wxGTK depends on (F27 SDL, F28 SDL2)
