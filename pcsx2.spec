@@ -1,179 +1,129 @@
-Name: pcsx2
-Version: 1.4
-Release: 12%{?dist}
-Summary: A Sony Playstation2 emulator
-License: GPLv3
-URL: https://github.com/PCSX2/pcsx2
-#github source contains copyrighted material, so downloaded and modified with
-#script download_pcsx2_1.4_tarball.sh contained in Source1
-Source0: pcsx2.1.4.tar.gz
-Source1: download_pcsx2_1.4_tarball.sh
-Patch1:  pcsx2-gcc6.patch
-Patch2:  pcsx2-wxWidgets-SDL2.patch
-# PCSX2 does not support running as a 64 bit application.
-# http://code.google.com/p/pcsx2/wiki/ChrootAnd64bStatusLinux
-ExclusiveArch: i686
-BuildRequires: gcc gcc-c++
-BuildRequires: desktop-file-utils
-BuildRequires: cmake
-BuildRequires: zlib-devel
-BuildRequires: bzip2-devel
-BuildRequires: freetype-devel
-BuildRequires: gettext
-BuildRequires: glew-devel
-BuildRequires: libGL-devel
-BuildRequires: libGLU-devel
-BuildRequires: libX11-devel
-BuildRequires: libICE-devel
-BuildRequires: libXrandr-devel
-BuildRequires: mesa-libGLES-devel
-BuildRequires: alsa-lib-devel
-BuildRequires: gtk2-devel
-#BuildRequires: gtk3-devel
-BuildRequires: portaudio-devel
-BuildRequires: sparsehash-devel
-%if (0%{?fedora} >= 28)
-BuildRequires: SDL2-devel
-%else
-BuildRequires: SDL-devel
-%endif
-# use SDL that depends wxGTK
-%if (0%{?fedora} >= 27)
-BuildRequires: compat-wxGTK3-gtk2-devel
-%else
-BuildRequires: wxGTK-devel
-%endif
-#BuildRequires: wxGTK3-devel
-BuildRequires: soundtouch-devel
-BuildRequires: libaio-devel
-BuildRequires: lzma-devel
-BuildRequires: xz-devel
-# for /usr/bin/perl
-%if 0%{?rhel} && 0%{?rhel} < 8
-BuildRequires: perl
-BuildRequires: perl-version
-%else
-BuildRequires: perl-interpreter
-%endif
+%global commit      5308be3c4d1c5b4026ce9cd70ba0b591e9b95f68
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global date        20200205
 
-Requires: joystick
-Requires: hicolor-icon-theme
+%global appname PCSX2
+
+Name:           pcsx2
+Version:        1.5.0
+Release:        5.%{date}git%{shortcommit}%{?dist}
+Summary:        Playstation 2 Emulator
+
+License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
+URL:            https://pcsx2.net
+Source0:        https://github.com/%{appname}/%{name}/archive/%{commit}/%{name}-%{version}.%{date}git%{shortcommit}.tar.gz
+ExclusiveArch:  i686
+
+BuildRequires:  cmake
+BuildRequires:  desktop-file-utils
+BuildRequires:  gcc-c++
+BuildRequires:  gettext
+BuildRequires:  libaio-devel
+BuildRequires:  ninja-build
+BuildRequires:  perl
+BuildRequires:  wxGTK3-devel
+BuildRequires:  xz-devel
+BuildRequires:  pkgconfig(alsa)
+BuildRequires:  pkgconfig(freetype2)
+BuildRequires:  pkgconfig(gtk+-3.0)
+BuildRequires:  pkgconfig(libpcap)
+BuildRequires:  pkgconfig(libpng)
+BuildRequires:  pkgconfig(libsystemd)
+BuildRequires:  pkgconfig(libxml-2.0)
+BuildRequires:  pkgconfig(portaudio-2.0)
+BuildRequires:  pkgconfig(sdl2)
+BuildRequires:  pkgconfig(soundtouch)
+BuildRequires:  pkgconfig(zlib)
+Recommends:     %{name}-langpacks = %{version}-%{release}
 
 %description
-A Playstation 2 emulator. Requires a dump of a real PS2 BIOS (not included)
-WARNING: It requires a CPU with SSE2 instructions. If your CPU does not
-support this instruction set, it does not have enough horsepower to run
-this emulator anyway.
+PCSX2 is a free and open-source PlayStation 2 (PS2) emulator. Its purpose is to
+emulate the PS2's hardware, using a combination of MIPS CPU Interpreters,
+Recompilers and a Virtual Machine which manages hardware states and PS2 system
+memory. This allows you to play PS2 games on your PC, with many additional
+features and benefits.
+
+The PCSX2 project has been running for more than ten years. Past versions could
+only run a few public domain game demos, but newer versions can run many games
+at full speed, including popular titles such as Final Fantasy X and Devil May
+Cry 3. Visit the PCSX2 homepage to check the latest compatibility status of
+games (with more than 2000 titles tested), or ask for help in the official
+forums.
+
+
+# Langpacks package
+%package        langpacks
+Summary:        Translations files for %{appname}
+BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
+
+%description    langpacks
+Translations files for %{appname}.
+
 
 %prep
-%setup -q -n pcsx2-1.4
-%patch1 -p1 -b .gcc6
-%patch2 -p1 -b .SDL2
+%autosetup -n %{name}-%{commit} -p1
+mkdir -p %{_target_platform}
+# Unbundle third-party
+rm -r 3rdparty/
 
-# To remove executable bits from man, doc and icon files
-chmod -x pcsx2/Docs/GPL.txt pcsx2/Docs/License.txt pcsx2/Docs/readme-Docs.txt pcsx2/Docs/PCSX2_FAQ.doc pcsx2/Docs/PCSX2_Readme.doc bin/docs/PCSX2.1 linux_various/PCSX2.xpm
-
-# Remove DOS encoding errors in txt files
-sed -i 's/\r//' pcsx2/Docs/GPL.txt
-sed -i 's/\r//' pcsx2/Docs/License.txt
-
-#Remove fedora incompatible values
-sed -i 's/@PCSX2_MENU_CATEGORIES@/Game;Emulator;GTK;/g' linux_various/PCSX2.desktop.in
 
 %build
-
-# pcsx2 contains cflags that override Fedora cflags, however
-# a conservative approach has been taken because to quote upsteam "PCSX2 is not
-# an ordinary sofware. Most of the code executed are self-generated by PCSX2
-# itself (aka dynamic recompiler/virtual machine). That means 1/ gcc flags
-# have no much impact on speed 2/ some gcc flags (used to) crash PCSX2"
-# Extensive testing will is therefore needed. See rpmfusion bug #2455      
-
-%if 0%{?fedora} == 27
-export WX_CONFIG=wx-config-3.0-gtk2
-%endif
-
-%cmake . -DPACKAGE_MODE=TRUE \
-	 -DBUILD_REPLAY_LOADERS=FALSE \
-	 -DXDG_STD=TRUE \
-	 -DGLSL_API=TRUE \
-	 -DPLUGIN_DIR=%{_libdir}/pcsx2 \
-	 -DGAMEINDEX_DIR=%{_datadir}/pcsx2 \
-	 -DCMAKE_BUILD_STRIP=FALSE \
-	 -DGTK3_API=FALSE \
-%if (0%{?fedora} >= 27)
-	 -DWX28_API=FALSE \
-%else
-	 -DWX28_API=TRUE \
-%endif
-%if (0%{?fedora} >= 28)
-     -DSDL2_API=TRUE \
-%else
-	 -DSDL2_API=FALSE \
-%endif
-	 -DEXTRA_PLUGINS=FALSE \
- 	 -DDISABLE_ADVANCE_SIMD=TRUE \
- 	 -DOpenGL_GL_PREFERENCE=GLVND \
-	 -DCMAKE_BUILD_TYPE=Release
-
-         
-make %{?_smp_mflags} VERBOSE=1
+%set_build_flags
+pushd %{_target_platform}
+%cmake -G Ninja                                 \
+    -DCMAKE_BUILD_PO=TRUE                       \
+    -DCMAKE_BUILD_TYPE=Release                  \
+    -DCMAKE_INSTALL_PREFIX=%{_prefix}           \
+    -DDISABLE_ADVANCE_SIMD=TRUE                 \
+    -DDISABLE_PCSX2_WRAPPER=TRUE                \
+    -DDOC_DIR=%{_docdir}/%{name}                \
+    -DGAMEINDEX_DIR=%{_datadir}/games/%{name}   \
+    -DGTK3_API=TRUE                             \
+    -DPACKAGE_MODE=TRUE                         \
+    -DPLUGIN_DIR=%{_libdir}/games/%{name}       \
+    -DXDG_STD=TRUE                              \
+%dnl # TODO: Fix build with LTO: -DUSE_LTO=TRUE \
+    ..
+popd
+%ninja_build -C %{_target_platform}
 
 
 %install
-
-make install DESTDIR=%{buildroot}
-
-# strip extra copies of pdf files, which are now in /doc/pcsx2
-rm -rf %{buildroot}/usr/share/doc/PCSX2
-
-# Install icon
-mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
-install -pm 644 %{_builddir}/%{name}-%{version}/linux_various/PCSX2.xpm %{buildroot}/%{_datadir}/icons/hicolor/128x128/apps/
-
-# Install Desktop file
-mv %{_builddir}/%{name}-%{version}/linux_various/PCSX2.desktop.in %{_builddir}/%{name}-%{version}/linux_various/PCSX2.desktop
-desktop-file-install                                    \
---dir=%{buildroot}/%{_datadir}/applications              \
-%{_builddir}/%{name}-%{version}/linux_various/PCSX2.desktop
+%ninja_install -C %{_target_platform}
+%find_lang %{name}_Iconized
+%find_lang %{name}_Main
 
 
-#strip extra copy of icon file, Wrong place for fedora
-rm -rf %{buildroot}/usr/share/pixmaps
+%check
+desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
-# Install man page
-mkdir -p %{buildroot}/%{_mandir}/man1
-install -p -D -m 644 bin/docs/PCSX2.1 %{buildroot}/%{_mandir}/man1
 
-%find_lang pcsx2_Iconized
-%find_lang pcsx2_Main
+%files
+%license COPYING.GPLv2 COPYING.GPLv3 COPYING.LGPLv2.1 COPYING.LGPLv3
+%doc README.md
+%{_bindir}/%{appname}
+%{_datadir}/applications/*.desktop
+%{_datadir}/games/%{name}/
+%{_datadir}/pixmaps/%{appname}.xpm
+%{_docdir}/%{name}/*.pdf
+%{_libdir}/games/%{name}/
+%{_mandir}/man1/%{appname}*
 
-%post
-/sbin/ldconfig
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-
-%postun
-/sbin/ldconfig
-if [ $1 -eq 0 ] ; then
-    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    /usr/bin/gtk-update-icon-cache -f %{_datadir}/icons/hicolor &>/dev/null || :
-fi
-
-%posttrans
-/usr/bin/gtk-update-icon-cache -f %{_datadir}/icons/hicolor &>/dev/null || :
-
-%files -f pcsx2_Iconized.lang -f pcsx2_Main.lang
-%doc bin/docs/PCSX2_Readme.pdf bin/docs/PCSX2_FAQ.pdf 
-%{_bindir}/PCSX2
-%{_bindir}/PCSX2-linux.sh
-%{_libdir}/pcsx2/
-%{_datadir}/applications/PCSX2.desktop
-%{_datadir}/icons/hicolor/128x128/apps/PCSX2.xpm
-%{_mandir}/man1/PCSX2.*
-%{_datadir}/pcsx2/
+%files -f %{name}_Iconized.lang -f %{name}_Main.lang langpacks
+# FIXME: Directories without known owners:
+%dir %{_datadir}/locale/ar_SA/
+%dir %{_datadir}/locale/ar_SA/LC_MESSAGES
 
 
 %changelog
+* Wed Feb 05 2020 Artem Polishchuk <ego.cordatus@gmail.com> - 1.5.0-5.20200205git5308be3
+- Update to latest git snapshot
+
+* Sat Feb 01 2020 Artem Polishchuk <ego.cordatus@gmail.com> - 1.5.0-1.20200201git69ae598
+- Update to 1.5+
+
 * Tue Mar 05 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.4-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
