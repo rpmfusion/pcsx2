@@ -1,17 +1,13 @@
-%global commit      5308be3c4d1c5b4026ce9cd70ba0b591e9b95f68
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date        20200205
-
 %global appname PCSX2
 
 Name:           pcsx2
-Version:        1.5.0
-Release:        5.%{date}git%{shortcommit}%{?dist}
+Version:        1.6.0
+Release:        0.1rc%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
 URL:            https://pcsx2.net
-Source0:        https://github.com/%{appname}/%{name}/archive/%{commit}/%{name}-%{version}.%{date}git%{shortcommit}.tar.gz
+Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}-rc/%{name}-%{version}-rc.tar.gz
 ExclusiveArch:  i686
 
 BuildRequires:  cmake
@@ -34,6 +30,7 @@ BuildRequires:  pkgconfig(portaudio-2.0)
 BuildRequires:  pkgconfig(sdl2)
 BuildRequires:  pkgconfig(soundtouch)
 BuildRequires:  pkgconfig(zlib)
+
 Recommends:     %{name}-langpacks = %{version}-%{release}
 
 %description
@@ -63,8 +60,9 @@ Translations files for %{appname}.
 
 
 %prep
-%autosetup -n %{name}-%{commit} -p1
+%autosetup -n %{name}-%{version}-rc -p1
 mkdir -p %{_target_platform}
+
 # Unbundle third-party
 rm -r 3rdparty/
 
@@ -112,12 +110,16 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_mandir}/man1/%{appname}*
 
 %files -f %{name}_Iconized.lang -f %{name}_Main.lang langpacks
+
 # FIXME: Directories without known owners:
 %dir %{_datadir}/locale/ar_SA/
 %dir %{_datadir}/locale/ar_SA/LC_MESSAGES
 
 
 %changelog
+* Fri Mar 27 2020 Artem Polishchuk <ego.cordatus@gmail.com> - 1.6.0-0.1rc
+- Update to 1.6-rc
+
 * Wed Feb 05 2020 Artem Polishchuk <ego.cordatus@gmail.com> - 1.5.0-5.20200205git5308be3
 - Update to latest git snapshot
 
