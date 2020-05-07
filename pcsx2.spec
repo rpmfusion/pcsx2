@@ -2,12 +2,12 @@
 
 Name:           pcsx2
 Version:        1.6.0
-Release:        0.1rc%{?dist}
+Release:        1%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
 URL:            https://pcsx2.net
-Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}-rc/%{name}-%{version}-rc.tar.gz
+Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 ExclusiveArch:  i686
 
 BuildRequires:  cmake
@@ -60,7 +60,7 @@ Translations files for %{appname}.
 
 
 %prep
-%autosetup -n %{name}-%{version}-rc -p1
+%autosetup -p1
 mkdir -p %{_target_platform}
 
 # Unbundle third-party
@@ -117,6 +117,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 
 %changelog
+* Thu May 07 2020 Artem Polishchuk <ego.cordatus@gmail.com> - 1.6.0-1
+- Update to 1.6
+
 * Fri Mar 27 2020 Artem Polishchuk <ego.cordatus@gmail.com> - 1.6.0-0.1rc
 - Update to 1.6-rc
 
