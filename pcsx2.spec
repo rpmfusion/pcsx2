@@ -2,7 +2,7 @@
 
 Name:           pcsx2
 Version:        1.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
@@ -82,6 +82,7 @@ pushd %{_target_platform}
     -DPACKAGE_MODE=TRUE                         \
     -DPLUGIN_DIR=%{_libdir}/games/%{name}       \
     -DXDG_STD=TRUE                              \
+    -DEGL_API=TRUE                              \
 %dnl # TODO: Fix build with LTO: -DUSE_LTO=TRUE \
     ..
 popd
@@ -117,6 +118,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 
 %changelog
+* Mon May 18 2020 Sérgio Basto <sergio@serjux.com> - 1.6.0-2
+- Enable egl
+
 * Thu May 07 2020 Artem Polishchuk <ego.cordatus@gmail.com> - 1.6.0-1
 - Update to 1.6
 
