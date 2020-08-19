@@ -1,5 +1,7 @@
 %global appname PCSX2
 
+%undefine __cmake_in_source_build
+
 Name:           pcsx2
 Version:        1.6.0
 Release:        3%{?dist}
@@ -10,7 +12,7 @@ URL:            https://pcsx2.net
 Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 ExclusiveArch:  i686
 
-BuildRequires:  cmake
+BuildRequires:  cmake3
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -61,7 +63,6 @@ Translations files for %{appname}.
 
 %prep
 %autosetup -p1
-mkdir -p %{_target_platform}
 
 # Unbundle third-party
 rm -r 3rdparty/
@@ -69,8 +70,7 @@ rm -r 3rdparty/
 
 %build
 %set_build_flags
-pushd %{_target_platform}
-%cmake -G Ninja                                 \
+%cmake3 -G Ninja                                 \
     -DCMAKE_BUILD_PO=TRUE                       \
     -DCMAKE_BUILD_TYPE=Release                  \
     -DCMAKE_INSTALL_PREFIX=%{_prefix}           \
@@ -84,13 +84,12 @@ pushd %{_target_platform}
     -DXDG_STD=TRUE                              \
     -DEGL_API=TRUE                              \
 %dnl # TODO: Fix build with LTO: -DUSE_LTO=TRUE \
-    ..
-popd
-%ninja_build -C %{_target_platform}
+
+%cmake3_build
 
 
 %install
-%ninja_install -C %{_target_platform}
+%cmake3_install
 %find_lang %{name}_Iconized
 %find_lang %{name}_Main
 
