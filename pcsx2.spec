@@ -4,7 +4,7 @@
 
 Name:           pcsx2
 Version:        1.6.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
@@ -21,6 +21,7 @@ BuildRequires:  ninja-build
 BuildRequires:  perl
 BuildRequires:  wxGTK3-devel
 BuildRequires:  xz-devel
+
 BuildRequires:  pkgconfig(alsa)
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(gtk+-3.0)
@@ -32,6 +33,12 @@ BuildRequires:  pkgconfig(portaudio-2.0)
 BuildRequires:  pkgconfig(sdl2)
 BuildRequires:  pkgconfig(soundtouch)
 BuildRequires:  pkgconfig(zlib)
+
+# https://bugzilla.rpmfusion.org/show_bug.cgi?id=6054
+Requires:       alsa-plugins-pulseaudio
+Requires:       alsa-plugins-pulseaudio%{?_isa}
+Requires:       mesa-dri-drivers
+Requires:       mesa-dri-drivers%{?_isa}
 
 Recommends:     %{name}-langpacks = %{version}-%{release}
 
@@ -70,7 +77,7 @@ rm -r 3rdparty/
 
 %build
 %set_build_flags
-%cmake3 -G Ninja                                 \
+%cmake3 -G Ninja                                \
     -DCMAKE_BUILD_PO=TRUE                       \
     -DCMAKE_BUILD_TYPE=Release                  \
     -DCMAKE_INSTALL_PREFIX=%{_prefix}           \
@@ -83,7 +90,8 @@ rm -r 3rdparty/
     -DPLUGIN_DIR=%{_libdir}/games/%{name}       \
     -DXDG_STD=TRUE                              \
     -DEGL_API=TRUE                              \
-%dnl # TODO: Fix build with LTO: -DUSE_LTO=TRUE \
+    %dnl  # -DUSE_LTO=TRUE                      \  # We handle this via default Fedora build flags
+    %{nil}
 
 %cmake3_build
 
@@ -107,7 +115,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/pixmaps/%{appname}.xpm
 %{_docdir}/%{name}/*.pdf
 %{_libdir}/games/%{name}/
-%{_mandir}/man1/%{appname}*
+%{_mandir}/man1/%{appname}.1*
 
 %files -f %{name}_Iconized.lang -f %{name}_Main.lang langpacks
 
@@ -117,6 +125,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 
 %changelog
+* Thu Oct 07 2021 Artem Polishchuk <ego.cordatus@gmail.com> - 1.6.0-6
+- build(add dep): alsa-plugins-pulseaudio, mesa-dri-drivers | #6054
+  https://bugzilla.rpmfusion.org/show_bug.cgi?id=6054
+
 * Wed Aug 04 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.6.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
