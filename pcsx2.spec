@@ -4,7 +4,7 @@
 
 Name:           pcsx2
 Version:        1.6.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
@@ -125,6 +125,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 
 %changelog
+* Thu Feb 10 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.6.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Thu Oct 07 2021 Artem Polishchuk <ego.cordatus@gmail.com> - 1.6.0-6
 - build(add dep): alsa-plugins-pulseaudio, mesa-dri-drivers | #6054
   https://bugzilla.rpmfusion.org/show_bug.cgi?id=6054
