@@ -4,7 +4,7 @@
 
 Name:           pcsx2
 Version:        1.6.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
@@ -125,6 +125,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 
 %changelog
+* Thu Aug 03 2023 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.6.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
 * Mon Aug 08 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.6.0-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild and ffmpeg
   5.1
