@@ -19,7 +19,7 @@ BuildRequires:  gettext
 BuildRequires:  libaio-devel
 BuildRequires:  ninja-build
 BuildRequires:  perl
-BuildRequires:  wxGTK3-devel
+BuildRequires:  wxGTK-devel
 BuildRequires:  xz-devel
 
 BuildRequires:  pkgconfig(alsa)
