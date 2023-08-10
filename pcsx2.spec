@@ -10,6 +10,8 @@ Summary:        Playstation 2 Emulator
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
 URL:            https://pcsx2.net
 Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch1:         wx-config-3.2.patch
+Patch2:         gcc12.patch
 ExclusiveArch:  i686
 
 BuildRequires:  cmake3

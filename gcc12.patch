@@ -1,0 +1,20 @@
+--- ./plugins/cdvdGigaherz/src/CDVD.h.orig	2023-08-10 16:16:20.716321111 +0100
++++ ./plugins/cdvdGigaherz/src/CDVD.h	2023-08-10 16:16:25.011311080 +0100
+@@ -29,6 +29,7 @@
+ #include <mutex>
+ #include <string>
+ #include <vector>
++#include <system_error>
+ 
+ #define CDVDdefs
+ #include <PS2Edefs.h>
+--- pcsx2-1.6.0/pcsx2/gui/i18n.cpp.orig	2023-08-10 16:37:17.172389358 +0100
++++ pcsx2-1.6.0/pcsx2/gui/i18n.cpp	2023-08-10 16:37:30.484358330 +0100
+@@ -37,7 +37,6 @@ static wxString i18n_GetBetterLanguageNa
+ 	{
+ 		case wxLANGUAGE_CHINESE:				return L"Chinese (Traditional)";
+ 		case wxLANGUAGE_CHINESE_TRADITIONAL:	return L"Chinese (Traditional)";
+-		case wxLANGUAGE_CHINESE_TAIWAN:			return L"Chinese (Traditional)";
+ 		case wxLANGUAGE_CHINESE_HONGKONG:		return L"Chinese (Traditional, Hong Kong)";
+ 		case wxLANGUAGE_CHINESE_MACAU:			return L"Chinese (Traditional, Macau)";
+ 	}

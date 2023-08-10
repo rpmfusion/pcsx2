@@ -1,0 +1,11 @@
+--- ./cmake/SearchForStuff.cmake.orig	2023-08-10 14:28:49.578246639 +0100
++++ ./cmake/SearchForStuff.cmake	2023-08-10 14:29:27.977160495 +0100
+@@ -35,7 +35,7 @@ else()
+     set(wxWidgets_CONFIG_OPTIONS --unicode=yes)
+ endif()
+ 
+-list(APPEND wxWidgets_CONFIG_OPTIONS --version=3.0)
++list(APPEND wxWidgets_CONFIG_OPTIONS --version=3.2)
+ 
+ if(GTK3_API AND NOT APPLE)
+     list(APPEND wxWidgets_CONFIG_OPTIONS --toolkit=gtk3)
