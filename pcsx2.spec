@@ -1,10 +1,14 @@
 %global appname PCSX2
+# Work around the following linker error:
+# /usr/bin/ld.bfd: pcsx2/CMakeFiles/PCSX2.dir/x86/aVUzerorec.S.o: warning: relocation against `s_writeP' in read-only section `.text'
+# /usr/bin/ld.bfd: error: read-only segment has dynamic relocations
+%global _distro_extra_ldflags -Wl,-z,notext
 
 %undefine __cmake_in_source_build
 
 Name:           pcsx2
 Version:        1.6.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
@@ -127,6 +131,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 
 
 %changelog
+* Thu Feb 05 2026 Dominik Mierzejewski <dominik@greysector.net> - 1.6.0-15
+- Work around FTBFS with GCC16
+
 * Mon Feb 02 2026 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.6.0-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
