@@ -3,48 +3,89 @@
 # /usr/bin/ld.bfd: pcsx2/CMakeFiles/PCSX2.dir/x86/aVUzerorec.S.o: warning: relocation against `s_writeP' in read-only section `.text'
 # /usr/bin/ld.bfd: error: read-only segment has dynamic relocations
 %global _distro_extra_ldflags -Wl,-z,notext
-
-%undefine __cmake_in_source_build
+%global _lto_cflags %{nil}
 
 Name:           pcsx2
-Version:        1.6.0
-Release:        15%{?dist}
+Version:        2.6.3
+Release:        1%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
 URL:            https://pcsx2.net
 Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch1:         wx-config-3.2.patch
-Patch2:         gcc12.patch
-ExclusiveArch:  i686
+Patch0:         pcsx2-2.6.3-climits.patch
+Patch1:         system-libzip.patch
 
-BuildRequires:  cmake3
+ExclusiveArch:  x86_64
+
+BuildRequires:  clang
+BuildRequires:  cmake
 BuildRequires:  desktop-file-utils
-BuildRequires:  gcc-c++
-BuildRequires:  gettext
-BuildRequires:  libaio-devel
-BuildRequires:  ninja-build
-BuildRequires:  perl
-BuildRequires:  wxGTK-devel
-BuildRequires:  xz-devel
-
+BuildRequires:  extra-cmake-modules
+BuildRequires:  fast_float-devel
+BuildRequires:  fdupes
+BuildRequires:  ImageMagick
+BuildRequires:  kddockwidgets-qt6-devel
+BuildRequires:  libappstream-glib
+BuildRequires:  libpcap-devel
+BuildRequires:  llvm
+BuildRequires:  qt6-qtbase-private-devel
+BuildRequires:  unzip
+BuildRequires:  cmake(glslang)
+BuildRequires:  cmake(ryml)
+BuildRequires:  pkgconfig(Qt6Concurrent)
+BuildRequires:  pkgconfig(Qt6Core)
+BuildRequires:  pkgconfig(Qt6Gui)
+BuildRequires:  pkgconfig(Qt6Linguist)
+BuildRequires:  pkgconfig(Qt6Network)
+BuildRequires:  pkgconfig(Qt6WaylandClient)
+BuildRequires:  pkgconfig(Qt6WaylandCompositor)
+BuildRequires:  pkgconfig(Qt6Widgets)
 BuildRequires:  pkgconfig(alsa)
+BuildRequires:  pkgconfig(dbus-1)
+BuildRequires:  pkgconfig(egl)
+BuildRequires:  pkgconfig(fmt)
 BuildRequires:  pkgconfig(freetype2)
-BuildRequires:  pkgconfig(gtk+-3.0)
-BuildRequires:  pkgconfig(libpcap)
-BuildRequires:  pkgconfig(libpng)
-BuildRequires:  pkgconfig(libsystemd)
+BuildRequires:  pkgconfig(gl)
+BuildRequires:  pkgconfig(harfbuzz)
+BuildRequires:  pkgconfig(jack)
+BuildRequires:  pkgconfig(libavcodec)
+BuildRequires:  pkgconfig(libavformat)
+BuildRequires:  pkgconfig(libavutil)
+BuildRequires:  pkgconfig(libcurl)
+BuildRequires:  pkgconfig(libjpeg)
+BuildRequires:  pkgconfig(liblz4)
+BuildRequires:  pkgconfig(liblzma)
+BuildRequires:  pkgconfig(libpng16)
+BuildRequires:  pkgconfig(libpulse)
+BuildRequires:  pkgconfig(libswresample)
+BuildRequires:  pkgconfig(libswscale)
+BuildRequires:  pkgconfig(libudev)
+BuildRequires:  pkgconfig(libwebp)
 BuildRequires:  pkgconfig(libxml-2.0)
+BuildRequires:  pkgconfig(libzip)
+BuildRequires:  pkgconfig(libzstd)
+BuildRequires:  pkgconfig(plutosvg)
 BuildRequires:  pkgconfig(portaudio-2.0)
+BuildRequires:  pkgconfig(samplerate)
 BuildRequires:  pkgconfig(sdl2)
+BuildRequires:  pkgconfig(sdl3)
+BuildRequires:  pkgconfig(shaderc)
 BuildRequires:  pkgconfig(soundtouch)
+BuildRequires:  pkgconfig(vulkan)
+BuildRequires:  pkgconfig(wayland-egl)
+BuildRequires:  pkgconfig(x11)
+BuildRequires:  pkgconfig(xi)
+BuildRequires:  pkgconfig(xrandr)
+BuildRequires:  pkgconfig(xrender)
 BuildRequires:  pkgconfig(zlib)
 
 # https://bugzilla.rpmfusion.org/show_bug.cgi?id=6054
-Requires:       alsa-plugins-pulseaudio
 Requires:       alsa-plugins-pulseaudio%{?_isa}
-Requires:       mesa-dri-drivers
 Requires:       mesa-dri-drivers%{?_isa}
+
+Obsoletes:      pcsx2 < %{version}-%{release}
+Provides:       pcsx2 = %{version}-%{release}
 
 Recommends:     %{name}-langpacks = %{version}-%{release}
 
@@ -68,7 +109,7 @@ forums.
 Summary:        Translations files for %{appname}
 BuildArch:      noarch
 
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    langpacks
 Translations files for %{appname}.
@@ -76,61 +117,77 @@ Translations files for %{appname}.
 
 %prep
 %autosetup -p1
-
-# Unbundle third-party
-rm -r 3rdparty/
-
+sed -i 's/"Unknown"/"%{version}"/g' cmake/Pcsx2Utils.cmake
 
 %build
-%set_build_flags
-%cmake3 -G Ninja                                \
-    -DCMAKE_BUILD_PO=TRUE                       \
-    -DCMAKE_BUILD_TYPE=Release                  \
-    -DCMAKE_INSTALL_PREFIX=%{_prefix}           \
-    -DDISABLE_ADVANCE_SIMD=TRUE                 \
-    -DDISABLE_PCSX2_WRAPPER=TRUE                \
-    -DDOC_DIR=%{_docdir}/%{name}                \
-    -DGAMEINDEX_DIR=%{_datadir}/games/%{name}   \
-    -DGTK3_API=TRUE                             \
-    -DPACKAGE_MODE=TRUE                         \
-    -DPLUGIN_DIR=%{_libdir}/games/%{name}       \
-    -DXDG_STD=TRUE                              \
-    -DEGL_API=TRUE                              \
-    %dnl  # -DUSE_LTO=TRUE                      \  # We handle this via default Fedora build flags
-    %{nil}
+%cmake \
+  -DCMAKE_BUILD_TYPE= \
+  -DUSE_BACKTRACE:BOOL=OFF \
+  -DCMAKE_C_COMPILER:STRING=clang \
+  -DCMAKE_CXX_COMPILER:STRING=clang++ \
+  -DCMAKE_RANLIB:PATH=%{_bindir}/llvm-ranlib \
+  -DCMAKE_AR:PATH=%{_bindir}/llvm-ar \
+  -DCMAKE_NM:PATH=%{_bindir}/llvm-nm \
+  -DCMAKE_BUILD_TYPE:STRING="Release" \
+  -DBUILD_SHARED_LIBS:BOOL=OFF \
+  -DDISABLE_ADVANCE_SIMD:BOOL=ON \
+  -DPACKAGE_MODE:BOOL=ON \
+  -DQT_NO_PRIVATE_MODULE_WARNING:BOOL=ON \
+  -DX11_API=:BOOL=ON \
+  -DWAYLAND_API:BOOL=ON
 
-%cmake3_build
+
+%cmake_build
 
 
 %install
-%cmake3_install
-%find_lang %{name}_Iconized
-%find_lang %{name}_Main
+%cmake_install
+
+for f in %{buildroot}%{_datadir}/PCSX2/translations/pcsx2-qt_*.qm; do
+    locale=$(basename "$f" .qm)
+    locale=${locale#pcsx2-qt_}
+    echo "%lang($locale) %{_datadir}/PCSX2/translations/$(basename "$f")" >> pcsx2_qt.lang
+done
+
+for size in 16 22 24 32 48 64 128 256 512; do
+    mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${size}x${size}/apps
+    convert bin/resources/icons/AppIconLarge.png \
+        -resize ${size}x${size} \
+        -filter Lanczos \
+        -unsharp 0x0.75 \
+        %{buildroot}%{_datadir}/icons/hicolor/${size}x${size}/apps/PCSX2.png
+done
+
+mkdir -p %{buildroot}%{_datadir}/applications}
+install -Dp -m0644 .github/workflows/scripts/linux/%name-qt.desktop %{buildroot}%{_datadir}/applications/%name-qt.desktop
+
+sed -i -e "s/@GIT_VERSION@\" date=\"@GIT_DATE@/%{version}/" .github/workflows/scripts/linux/pcsx2-qt.metainfo.xml.in
+sed -i -e "s/~git/\" date=\"/" .github/workflows/scripts/linux/pcsx2-qt.metainfo.xml.in
+mkdir -p %{buildroot}%{_metainfodir}
+cp .github/workflows/scripts/linux/pcsx2-qt.metainfo.xml.in %{buildroot}%{_metainfodir}/net.pcsx2.PCSX2.appdata.xml
 
 
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
-
+appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/net.pcsx2.PCSX2.appdata.xml
 
 %files
-%license COPYING.GPLv2 COPYING.GPLv3 COPYING.LGPLv2.1 COPYING.LGPLv3
+%license COPYING.GPLv3
 %doc README.md
-%{_bindir}/%{appname}
+%{_bindir}/%{name}-qt
 %{_datadir}/applications/*.desktop
-%{_datadir}/games/%{name}/
-%{_datadir}/pixmaps/%{appname}.xpm
-%{_docdir}/%{name}/*.pdf
-%{_libdir}/games/%{name}/
-%{_mandir}/man1/%{appname}.1*
+%dir %{_datadir}/%{appname}
+%{_datadir}/%{appname}/resources/
+%{_datadir}/icons/hicolor/*/apps/%{appname}.png
+%{_metainfodir}/net.pcsx2.PCSX2.appdata.xml
 
-%files -f %{name}_Iconized.lang -f %{name}_Main.lang langpacks
-
-# FIXME: Directories without known owners:
-%dir %{_datadir}/locale/ar_SA/
-%dir %{_datadir}/locale/ar_SA/LC_MESSAGES
+%files langpacks -f %{name}_qt.lang
 
 
 %changelog
+* Sat Jun 20 2026 Leigh Scott <leigh123linux@gmail.com> - 2.6.3-1
+- Update to 2.6.3
+
 * Thu Feb 05 2026 Dominik Mierzejewski <dominik@greysector.net> - 1.6.0-15
 - Work around FTBFS with GCC16
 

@@ -1,0 +1,22 @@
+From: David James <davidjamescastor215@proton.me>
+Date: Thu, 23 Jan 2025 15:44:47 +0000
+Subject: system-libzip
+
+===================================================================
+---
+ cmake/SearchForStuff.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/SearchForStuff.cmake b/cmake/SearchForStuff.cmake
+index 504b7a3..6af4d28 100644
+--- a/cmake/SearchForStuff.cmake
++++ b/cmake/SearchForStuff.cmake
+@@ -88,7 +88,7 @@ add_subdirectory(3rdparty/simpleini EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/imgui EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/cpuinfo EXCLUDE_FROM_ALL)
+ disable_compiler_warnings_for_target(cpuinfo)
+-add_subdirectory(3rdparty/libzip EXCLUDE_FROM_ALL)
++find_package(libzip REQUIRED)
+ add_subdirectory(3rdparty/rcheevos EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/rapidjson EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/discord-rpc EXCLUDE_FROM_ALL)
