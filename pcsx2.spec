@@ -1,25 +1,23 @@
 %global appname PCSX2
-# Work around the following linker error:
-# /usr/bin/ld.bfd: pcsx2/CMakeFiles/PCSX2.dir/x86/aVUzerorec.S.o: warning: relocation against `s_writeP' in read-only section `.text'
-# /usr/bin/ld.bfd: error: read-only segment has dynamic relocations
-%global _distro_extra_ldflags -Wl,-z,notext
 %global _lto_cflags %{nil}
 
 Name:           pcsx2
 Version:        2.6.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
 URL:            https://pcsx2.net
 Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         pcsx2-2.6.3-climits.patch
-Patch1:         system-libzip.patch
+Patch1:         fix-lzma-issue.patch
+Patch2:         Use_system_libs.patch
 
 ExclusiveArch:  x86_64
 
 BuildRequires:  clang
 BuildRequires:  cmake
+BuildRequires:  cpuinfo-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  extra-cmake-modules
 BuildRequires:  fast_float-devel
@@ -28,11 +26,13 @@ BuildRequires:  ImageMagick
 BuildRequires:  kddockwidgets-qt6-devel
 BuildRequires:  libappstream-glib
 BuildRequires:  libpcap-devel
-BuildRequires:  llvm
 BuildRequires:  qt6-qtbase-private-devel
 BuildRequires:  unzip
+BuildRequires:  vulkan-headers
+BuildRequires:  cmake(cubeb)
 BuildRequires:  cmake(glslang)
 BuildRequires:  cmake(ryml)
+BuildRequires:  cmake(VulkanMemoryAllocator)
 BuildRequires:  pkgconfig(Qt6Concurrent)
 BuildRequires:  pkgconfig(Qt6Core)
 BuildRequires:  pkgconfig(Qt6Gui)
@@ -72,6 +72,7 @@ BuildRequires:  pkgconfig(sdl2)
 BuildRequires:  pkgconfig(sdl3)
 BuildRequires:  pkgconfig(shaderc)
 BuildRequires:  pkgconfig(soundtouch)
+BuildRequires:  pkgconfig(speex)
 BuildRequires:  pkgconfig(vulkan)
 BuildRequires:  pkgconfig(wayland-egl)
 BuildRequires:  pkgconfig(x11)
@@ -117,25 +118,23 @@ Translations files for %{appname}.
 
 %prep
 %autosetup -p1
+rm -rf 3rdparty/{vulkan,libzip,fast_float,fmt,cpuinfo,cubeb,soundtouch}
 sed -i 's/"Unknown"/"%{version}"/g' cmake/Pcsx2Utils.cmake
 
 %build
 %cmake \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_CXX_COMPILER=clang++ \
   -DCMAKE_BUILD_TYPE= \
   -DUSE_BACKTRACE:BOOL=OFF \
-  -DCMAKE_C_COMPILER:STRING=clang \
-  -DCMAKE_CXX_COMPILER:STRING=clang++ \
-  -DCMAKE_RANLIB:PATH=%{_bindir}/llvm-ranlib \
-  -DCMAKE_AR:PATH=%{_bindir}/llvm-ar \
-  -DCMAKE_NM:PATH=%{_bindir}/llvm-nm \
   -DCMAKE_BUILD_TYPE:STRING="Release" \
   -DBUILD_SHARED_LIBS:BOOL=OFF \
+  -DUSE_LINKED_FFMPEG=ON \
   -DDISABLE_ADVANCE_SIMD:BOOL=ON \
   -DPACKAGE_MODE:BOOL=ON \
   -DQT_NO_PRIVATE_MODULE_WARNING:BOOL=ON \
   -DX11_API=:BOOL=ON \
   -DWAYLAND_API:BOOL=ON
-
 
 %cmake_build
 
@@ -185,6 +184,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/net.pcsx2.PCSX
 
 
 %changelog
+* Mon Jun 22 2026 Leigh Scott <leigh123linux@gmail.com> - 2.6.3-2
+- Try to use system libs where possible
+
 * Sat Jun 20 2026 Leigh Scott <leigh123linux@gmail.com> - 2.6.3-1
 - Update to 2.6.3
 

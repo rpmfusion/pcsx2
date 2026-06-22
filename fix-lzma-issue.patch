@@ -1,0 +1,10 @@
+--- a/3rdparty/lzma/CMakeLists.txt	2026-01-28 16:36:27.000000000 +0000
++++ b/3rdparty/lzma/CMakeLists.txt	2026-06-22 11:43:04.905417372 +0100
+@@ -88,6 +88,7 @@ add_library(pcsx2-lzma STATIC
+ )
+ 
+ target_compile_definitions(pcsx2-lzma PRIVATE _7ZIP_ST)
++set_target_properties(pcsx2-lzma PROPERTIES POSITION_INDEPENDENT_CODE ON)
+ 
+ target_include_directories(pcsx2-lzma PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+ target_include_directories(pcsx2-lzma INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")

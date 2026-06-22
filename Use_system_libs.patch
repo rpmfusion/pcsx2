@@ -1,0 +1,134 @@
+diff -uNrp a/cmake/SearchForStuff.cmake b/cmake/SearchForStuff.cmake
+--- a/cmake/SearchForStuff.cmake	2026-01-28 16:36:27.000000000 +0000
++++ b/cmake/SearchForStuff.cmake	2026-06-22 13:20:32.823312934 +0100
+@@ -78,17 +78,23 @@ endif()
+ 
+ set(CMAKE_FIND_FRAMEWORK ${FIND_FRAMEWORK_BACKUP})
+ 
+-add_subdirectory(3rdparty/fast_float EXCLUDE_FROM_ALL)
++find_package(FastFloat REQUIRED)
++add_library(fast_float INTERFACE)
++target_link_libraries(fast_float INTERFACE FastFloat::fast_float)
+ add_subdirectory(3rdparty/rapidyaml EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/lzma EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/libchdr EXCLUDE_FROM_ALL)
+ disable_compiler_warnings_for_target(libchdr)
+-add_subdirectory(3rdparty/soundtouch EXCLUDE_FROM_ALL)
++pkg_check_modules(SOUNDTOUCH REQUIRED IMPORTED_TARGET soundtouch)
++add_library(pcsx2-soundtouch INTERFACE)
++add_library(SoundTouch::SoundTouch ALIAS pcsx2-soundtouch)
++target_link_libraries(pcsx2-soundtouch INTERFACE PkgConfig::SOUNDTOUCH)
++target_compile_options(pcsx2-soundtouch INTERFACE -fexceptions)
+ add_subdirectory(3rdparty/simpleini EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/imgui EXCLUDE_FROM_ALL)
+-add_subdirectory(3rdparty/cpuinfo EXCLUDE_FROM_ALL)
+-disable_compiler_warnings_for_target(cpuinfo)
+-add_subdirectory(3rdparty/libzip EXCLUDE_FROM_ALL)
++find_package(cpuinfo REQUIRED)
++add_library(cpuinfo ALIAS cpuinfo::cpuinfo)
++find_package(libzip REQUIRED)
+ add_subdirectory(3rdparty/rcheevos EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/rapidjson EXCLUDE_FROM_ALL)
+ add_subdirectory(3rdparty/discord-rpc EXCLUDE_FROM_ALL)
+@@ -99,12 +105,23 @@ if(USE_OPENGL)
+ endif()
+ 
+ if(USE_VULKAN)
+-	add_subdirectory(3rdparty/vulkan EXCLUDE_FROM_ALL)
+-endif()
+-
+-add_subdirectory(3rdparty/cubeb EXCLUDE_FROM_ALL)
+-disable_compiler_warnings_for_target(cubeb)
+-disable_compiler_warnings_for_target(speex)
++    pkg_check_modules(VULKAN REQUIRED IMPORTED_TARGET vulkan)
++    add_library(vulkan-headers INTERFACE)
++    target_link_libraries(vulkan-headers INTERFACE PkgConfig::VULKAN)
++    find_path(VK_INCLUDE_DIRS NAMES vk_mem_alloc.h
++        PATHS
++        /usr/include
++        /usr/local/include
++        )
++    set_target_properties(vulkan-headers PROPERTIES
++        INTERFACE_INCLUDE_DIRECTORIES ${vulkan-headers_INTERFACE_INCLUDE_DIRECTORIES} ${VK_INCLUDE_DIRS}
++        )
++endif()
++
++find_package(cubeb REQUIRED)
++pkg_check_modules(SPEEX REQUIRED IMPORTED_TARGET speex)
++add_library(cubeb INTERFACE)
++target_link_libraries(cubeb INTERFACE cubeb::cubeb PkgConfig::SPEEX)
+ 
+ # Find the Qt components that we need.
+ if(ENABLE_QT_UI)
+@@ -135,9 +152,9 @@ elseif(_M_ARM64)
+ 	add_subdirectory(3rdparty/vixl EXCLUDE_FROM_ALL)
+ endif()
+ 
+-# Prevent fmt from being built with exceptions, or being thrown at call sites.
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMT_USE_EXCEPTIONS=0 -DFMT_USE_RTTI=0")
+-add_subdirectory(3rdparty/fmt EXCLUDE_FROM_ALL)
++find_package(fmt REQUIRED)
++add_library(fmt INTERFACE)
++target_link_libraries(fmt INTERFACE fmt::fmt)
+ 
+ # Deliberately at the end. We don't want to set the flag on third-party projects.
+ if(MSVC)
+diff -uNrp a/common/Console.h b/common/Console.h
+--- a/common/Console.h	2026-01-28 16:36:27.000000000 +0000
++++ b/common/Console.h	2026-06-22 12:04:46.416543188 +0100
+@@ -5,7 +5,7 @@
+ 
+ #include "Pcsx2Defs.h"
+ 
+-#include "fmt/base.h"
++#include <fmt/core.h>
+ 
+ #include <cstdarg>
+ #include <string>
+diff -uNrp a/common/SmallString.h b/common/SmallString.h
+--- a/common/SmallString.h	2026-01-28 16:36:27.000000000 +0000
++++ b/common/SmallString.h	2026-06-22 12:04:46.416856145 +0100
+@@ -5,7 +5,7 @@
+ 
+ #include "Pcsx2Defs.h"
+ 
+-#include "fmt/base.h"
++#include "fmt/core.h"
+ 
+ #include <algorithm>
+ #include <cstdarg>
+diff -uNrp a/pcsx2/Host/CubebAudioStream.cpp b/pcsx2/Host/CubebAudioStream.cpp
+--- a/pcsx2/Host/CubebAudioStream.cpp	2026-01-28 16:36:27.000000000 +0000
++++ b/pcsx2/Host/CubebAudioStream.cpp	2026-06-22 12:45:27.451583874 +0100
+@@ -306,14 +306,28 @@ std::unique_ptr<AudioStream> AudioStream
+ 	return stream;
+ }
+ 
++const char**
++cubeb_get_backend_names()
++{
++  static const char* backend_names[] = {
++    "pulse",
++    "jack",
++    "alsa",
++    "sndio",
++    NULL,
++  };
++
++  return backend_names;
++}
++
+ std::vector<std::pair<std::string, std::string>> AudioStream::GetCubebDriverNames()
+ {
+ 	std::vector<std::pair<std::string, std::string>> names;
+ 	names.emplace_back(std::string(), TRANSLATE_STR("AudioStream", "Default"));
+ 
+-	auto cubeb_names = cubeb_get_backend_names();
+-	for (size_t i = 0; i < cubeb_names.count; i++)
+-		names.emplace_back(cubeb_names.names[i], cubeb_names.names[i]);
++	const char** cubeb_names = cubeb_get_backend_names();
++	for (u32 i = 0; cubeb_names[i] != nullptr; i++)
++		names.emplace_back(cubeb_names[i], cubeb_names[i]);
+ 
+ 	return names;
+ }
