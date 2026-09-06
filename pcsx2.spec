@@ -2,16 +2,15 @@
 %global _lto_cflags %{nil}
 
 Name:           pcsx2
-Version:        2.6.3
-Release:        3%{?dist}
+Version:        2.8.2
+Release:        1%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
 URL:            https://pcsx2.net
 Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         pcsx2-2.6.3-climits.patch
-Patch1:         fix-lzma-issue.patch
-Patch2:         Use_system_libs.patch
+Patch0:         fix-lzma-issue.patch
+Patch1:         Use_system_libs.patch
 
 ExclusiveArch:  x86_64
 
@@ -23,6 +22,7 @@ BuildRequires:  extra-cmake-modules
 BuildRequires:  fast_float-devel
 BuildRequires:  fdupes
 BuildRequires:  ImageMagick
+BuildRequires:  c4core-devel
 BuildRequires:  kddockwidgets-qt6-devel
 BuildRequires:  libappstream-glib
 BuildRequires:  libpcap-devel
@@ -184,6 +184,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/net.pcsx2.PCSX
 
 
 %changelog
+* Sun Sep 06 2026 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-1
+- Update to 2.8.2
+
 * Sun Aug 02 2026 RPM Fusion Release Engineering <leigh123linux@rpmfusion.org> - 2.6.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
 

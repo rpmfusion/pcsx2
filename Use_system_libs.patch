@@ -1,7 +1,15 @@
 diff -uNrp a/cmake/SearchForStuff.cmake b/cmake/SearchForStuff.cmake
 --- a/cmake/SearchForStuff.cmake	2026-01-28 16:36:27.000000000 +0000
 +++ b/cmake/SearchForStuff.cmake	2026-06-22 13:20:32.823312934 +0100
-@@ -78,17 +78,23 @@ endif()
+@@ -21,6 +21,7 @@ find_package(SDL3 3.2.6 REQUIRED)
+ find_package(Freetype 2.10 REQUIRED) # 2.10 is the first with COLRv0 support, which we need for rendering emoji
+ find_package(plutovg 1.1.0 REQUIRED)
+ find_package(plutosvg 0.0.7 REQUIRED)
++find_package(c4core REQUIRED)
+ find_package(ryml REQUIRED)
+ if (WIN32)
+ 	find_package(DirectX-Headers 1.618.1 REQUIRED)
+@@ -83,16 +84,22 @@ endif()
  
  set(CMAKE_FIND_FRAMEWORK ${FIND_FRAMEWORK_BACKUP})
  
@@ -9,7 +17,6 @@ diff -uNrp a/cmake/SearchForStuff.cmake b/cmake/SearchForStuff.cmake
 +find_package(FastFloat REQUIRED)
 +add_library(fast_float INTERFACE)
 +target_link_libraries(fast_float INTERFACE FastFloat::fast_float)
- add_subdirectory(3rdparty/rapidyaml EXCLUDE_FROM_ALL)
  add_subdirectory(3rdparty/lzma EXCLUDE_FROM_ALL)
  add_subdirectory(3rdparty/libchdr EXCLUDE_FROM_ALL)
  disable_compiler_warnings_for_target(libchdr)
@@ -30,7 +37,7 @@ diff -uNrp a/cmake/SearchForStuff.cmake b/cmake/SearchForStuff.cmake
  add_subdirectory(3rdparty/rcheevos EXCLUDE_FROM_ALL)
  add_subdirectory(3rdparty/rapidjson EXCLUDE_FROM_ALL)
  add_subdirectory(3rdparty/discord-rpc EXCLUDE_FROM_ALL)
-@@ -99,12 +105,23 @@ if(USE_OPENGL)
+@@ -103,12 +110,23 @@ if(USE_OPENGL)
  endif()
  
  if(USE_VULKAN)
@@ -60,7 +67,7 @@ diff -uNrp a/cmake/SearchForStuff.cmake b/cmake/SearchForStuff.cmake
  
  # Find the Qt components that we need.
  if(ENABLE_QT_UI)
-@@ -135,9 +152,9 @@ elseif(_M_ARM64)
+@@ -141,9 +159,9 @@ elseif(ARCH_ARM64)
  	add_subdirectory(3rdparty/vixl EXCLUDE_FROM_ALL)
  endif()
  
@@ -73,6 +80,7 @@ diff -uNrp a/cmake/SearchForStuff.cmake b/cmake/SearchForStuff.cmake
  
  # Deliberately at the end. We don't want to set the flag on third-party projects.
  if(MSVC)
+
 diff -uNrp a/common/Console.h b/common/Console.h
 --- a/common/Console.h	2026-01-28 16:36:27.000000000 +0000
 +++ b/common/Console.h	2026-06-22 12:04:46.416543188 +0100
