@@ -13,7 +13,7 @@ Date: Sat, 8 Aug 2026 18:52:32 +0700
  	X(av_codec_iterate) \
  	X(av_packet_alloc) \
  	X(av_packet_free) \
-@@ -454,14 +455,16 @@ bool GSCapture::BeginCapture(float fps, GSVector2i recommendedResolution, float
+@@ -454,14 +455,16 @@ bool GSCapture::BeginCapture(float fps,
  		// Default to NV12 if not overridden by the user
  		const AVPixelFormat preferred_sw_pix_fmt = GSConfig.VideoCaptureFormat.empty() ? AV_PIX_FMT_NV12 : static_cast<AVPixelFormat>(std::stoi(GSConfig.VideoCaptureFormat));
  		AVPixelFormat sw_pix_fmt = preferred_sw_pix_fmt;
@@ -35,7 +35,7 @@ Date: Sat, 8 Aug 2026 18:52:32 +0700
  					break;
  				}
  			}
-@@ -686,18 +689,26 @@ bool GSCapture::BeginCapture(float fps, GSVector2i recommendedResolution, float
+@@ -686,18 +689,26 @@ bool GSCapture::BeginCapture(float fps,
  #endif
  
  		bool supports_format = false;
@@ -61,13 +61,13 @@ Date: Sat, 8 Aug 2026 18:52:32 +0700
 +
  		if (!supports_format)
  		{
- 			Console.WriteLn(fmt::format("Audio codec '{}' does not support S16 samples, using default.", acodec->name));
+ 			Console.WriteLn(fmt::format("Audio codec '{}' does not support float samples, using default.", acodec->name));
 -			s_audio_codec_context->sample_fmt = acodec->sample_fmts[0];
 +			s_audio_codec_context->sample_fmt = supported_sample_fmts[0];
  			s_swr_context = wrap_swr_alloc();
  			if (!s_swr_context)
  			{
-@@ -1532,16 +1543,18 @@ GSCapture::FormatList GSCapture::GetVideoFormatList(const char* codec)
+@@ -1532,16 +1543,18 @@ GSCapture::FormatList GSCapture::GetVide
  		return ret;
  	}
  
