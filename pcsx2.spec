@@ -3,7 +3,7 @@
 
 Name:           pcsx2
 Version:        2.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
@@ -11,6 +11,7 @@ URL:            https://pcsx2.net
 Source0:        https://github.com/%{appname}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         fix-lzma-issue.patch
 Patch1:         Use_system_libs.patch
+Patch2:         ffmpeg9.patch
 
 ExclusiveArch:  x86_64
 
@@ -184,6 +185,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/net.pcsx2.PCSX
 
 
 %changelog
+* Sun Sep 06 2026 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-2
+- Rebuild for ffmpeg-9
+
 * Sun Sep 06 2026 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-1
 - Update to 2.8.2
 
