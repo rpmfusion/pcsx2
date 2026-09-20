@@ -3,7 +3,7 @@
 
 Name:           pcsx2
 Version:        2.8.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Playstation 2 Emulator
 
 License:        GPLv2 and GPLv3+ and LGPLv2+ and LGPLv3
@@ -185,6 +185,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/net.pcsx2.PCSX
 
 
 %changelog
+* Sun Sep 20 2026 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-3
+- rebuilt
+
 * Sun Sep 06 2026 Leigh Scott <leigh123linux@gmail.com> - 2.8.2-2
 - Rebuild for ffmpeg-9
 
